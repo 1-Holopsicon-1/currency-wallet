@@ -1,0 +1,92 @@
+services:
+  wallet-database:
+    image: postgres:latest
+    container_name: wallet-database
+    restart: always
+    ports:
+      - 1616:5544
+    environment:
+      - POSTGRES_PASSWORD=pw
+      - POSTGRES_USER=user
+      - POSTGRES_DB=main
+      - PGPORT=5544
+    networks:
+      - db_network
+    healthcheck:
+      test: pg_isready -h localhost -p 5544
+      timeout: 1s
+      retries: 2
+
+    tty: true
+    stdin_open: true
+
+  wallet-cache:
+    image: redis:8.0-M03-alpine
+    container_name: wallet-cache
+    restart: always
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      timeout: 1s
+      retries: 2
+
+  wallet-backend:
+    image: wallet-backend
+    container_name: wallet-backend
+    networks:
+      - db_network
+    build:
+      context: .
+      dockerfile: gw-currency-wallet/Dockerfile
+    depends_on:
+      wallet-database:
+        condition: service_healthy
+      wallet-cache:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    tty: true
+    stdin_open: true
+
+  rates-database:
+    image: postgres:latest
+    container_name: rates-database
+    restart: always
+    ports:
+      - 1717:5533
+    environment:
+      - POSTGRES_PASSWORD=pw
+      - POSTGRES_USER=user
+      - POSTGRES_DB=main
+      - PGPORT=5533
+    networks:
+      - db_network
+    healthcheck:
+      test: pg_isready -h localhost -p 5533
+      timeout: 1s
+      retries: 2
+
+    tty: true
+    stdin_open: true
+
+  rates-backend:
+    image: rates-backend
+    container_name: rates-backend
+    networks:
+      - db_network
+    build:
+      context: .
+      dockerfile: gw-exchanger/Dockerfile
+    depends_on:
+      rates-database:
+        condition: service_healthy
+    ports:
+      - 50051:50051
+    tty: true
+    stdin_open: true
+
+
+networks:
+  db_network:
+    driver: bridge

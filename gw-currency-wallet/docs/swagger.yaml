@@ -1,0 +1,285 @@
+definitions:
+  dto.UserDto:
+    properties:
+      email:
+        example: user1@example.com
+        type: string
+      password:
+        example: password1
+        type: string
+      username:
+        example: User1
+        type: string
+    type: object
+  models.CurrencyExchangeRequset:
+    properties:
+      amount:
+        example: 100
+        type: number
+      from_currency:
+        example: USD
+        type: string
+      to_currency:
+        example: EUR
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact: {}
+  description: All endpoints Wallet (Rates, Balance), User
+  title: Wallet Api
+  version: "0.1"
+paths:
+  /api/v1/exchange:
+    post:
+      consumes:
+      - application/json
+      description: Exchange entered currencies
+      parameters:
+      - default: Bearer
+        description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Withdrawal amount
+        in: body
+        name: withdraw
+        required: true
+        schema:
+          $ref: '#/definitions/models.CurrencyExchangeRequset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Exchange rates
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Insufficient funds or invalid currencies
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Exchange currencies
+      tags:
+      - Exchange
+  /api/v1/exchange/rates:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves current exchange rates
+      parameters:
+      - default: Bearer
+        description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Exchange rates
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get exchange rates
+      tags:
+      - Exchange
+  /api/v1/user/balance:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the current balance of the user
+      parameters:
+      - default: Bearer
+        description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User balance
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get user balance
+      tags:
+      - Balance
+  /api/v1/user/balance/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Adds money to the user's balance
+      parameters:
+      - description: Deposit amount
+        in: body
+        name: deposit
+        required: true
+        schema:
+          additionalProperties:
+            type: number
+          type: object
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Deposit successful
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Deposit money
+      tags:
+      - Balance
+  /api/v1/user/balance/withdraw:
+    post:
+      consumes:
+      - application/json
+      description: Subtracts money from the user's balance
+      parameters:
+      - description: Withdrawal amount
+        in: body
+        name: withdraw
+        required: true
+        schema:
+          additionalProperties:
+            type: number
+          type: object
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Withdrawal successful
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Withdraw money
+      tags:
+      - Balance
+  /api/v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and provides a token
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Login User
+      tags:
+      - User
+  /api/v1/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user in the system
+      parameters:
+      - description: Registration data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

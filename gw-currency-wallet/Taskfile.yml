@@ -1,0 +1,27 @@
+# ./Taskfile.yml.yaml
+# See: https://taskfile.dev/api/
+
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - echo "Надо выбрать из 3 вариантов ':' swg, psql, rd"
+  swagger:
+    aliases:
+      - swg
+    desc: "Generate swagger from annotation"
+    cmds:
+      - swag init -g ../../../cmd/main.go --dir ./internal/app/handler --parseDependency --output ./docs
+  posgresql:
+    aliases:
+      - psql
+    desc: "Create docker container for Postgres"
+    cmds:
+      - docker run  -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pw -e POSTGRES_DB=main --name Exchange -dp 1515:5432 postgres:latest
+  redis:
+    aliases:
+      - rd
+    desc: "Create docker container for Postgres"
+    cmds:
+      - docker run -d --name redis_cache -p 6688:6379 redis:latest
