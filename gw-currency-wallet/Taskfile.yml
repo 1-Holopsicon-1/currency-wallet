@@ -6,7 +6,7 @@ version: "3"
 tasks:
   default:
     cmds:
-      - echo "Надо выбрать из 3 вариантов ':' swg, psql, rd"
+      - echo "Надо выбрать из 5 вариантов ':' swg, psql, rd, testDb, testCache"
   swagger:
     aliases:
       - swg
@@ -22,6 +22,18 @@ tasks:
   redis:
     aliases:
       - rd
-    desc: "Create docker container for Postgres"
+    desc: "Create docker container for Redis"
     cmds:
       - docker run -d --name redis_cache -p 6688:6379 redis:latest
+  testDb:
+    aliases:
+      - testDb
+    desc: "Create docker postgres container for tests"
+    cmds:
+      - docker run -d -e POSTGRES_USER=tester -e POSTGRES_PASSWORD=test1 -e POSTGRES_DB=test --name Exchange_tests -dp 2020:5432 postgres:latest
+  testCache:
+    aliases:
+      - testCache
+    desc: "Create docker redis container for tests"
+    cmds:
+      - docker run -d --name redis_test_cache -p 6677:6379 redis:latest
