@@ -20,4 +20,4 @@ RUN export PATH
 RUN swag init -g ../../../cmd/main.go --dir ./internal/app/handler --parseDependency --output ./docs
 
 EXPOSE 5000
-CMD ["go", "run", "cmd/main.go", "-migrate", "-start"]
+CMD ["go", "run", "cmd/main.go", "-docker", "-migrate", "-start"]
