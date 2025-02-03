@@ -5,6 +5,7 @@ import (
 	"exchanger/internal/app/storages/dto"
 	"fmt"
 	"gorm.io/gorm"
+	"math"
 	proto "proto-exchange/gen/exchange"
 	"strconv"
 )
@@ -62,17 +63,19 @@ func (exchangeService *ExchangeService) currentExchange(ctx context.Context, fcu
 
 	err := exchangeService.Db.WithContext(ctx).Raw(query, tcur, fcur, tcur).Scan(&currenciesDto).Error
 	if err != nil {
-		return dto.ExchangeDto{}, fmt.Errorf("can't get current exchange", err)
+		return dto.ExchangeDto{}, fmt.Errorf("can't get current exchange")
 	}
 
 	if (dto.ExchangeDto{}) == currenciesDto {
 		err = exchangeService.Db.WithContext(ctx).Raw(query, fcur, tcur, fcur).Scan(&currenciesDto).Error
 		v, err := strconv.ParseFloat(fmt.Sprintf("%.2f", 1/currenciesDto.Rate), 64)
 		if err != nil {
-			return dto.ExchangeDto{}, fmt.Errorf("Convert error", err)
+			return dto.ExchangeDto{}, fmt.Errorf("Convert error")
 		}
 		currenciesDto.Rate = v
 	}
-
+	if currenciesDto.Rate == math.Inf(0) {
+		currenciesDto.Rate = 0
+	}
 	return currenciesDto, nil
 }
