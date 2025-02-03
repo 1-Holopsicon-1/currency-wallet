@@ -5,6 +5,7 @@ import (
 	"exchanger/internal/app/storages/db"
 	"flag"
 	"fmt"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -12,9 +13,22 @@ import (
 )
 
 func main() {
+	docker := flag.Bool("docker", false, "Loading docker.env")
 	migr := flag.Bool("migrate", false, fmt.Sprint("Migrating Entity"))
 	startGrpc := flag.Bool("startGrpc", false, fmt.Sprint("Starting server"))
 	flag.Parse()
+
+	if *docker {
+		err := godotenv.Load("docker.env")
+		if err != nil {
+			panic("No env")
+		}
+	} else {
+		err := godotenv.Load(".env")
+		if err != nil {
+			panic("No env")
+		}
+	}
 
 	if *migr {
 		session := db.Connect()

@@ -14,4 +14,4 @@ COPY gw-exchanger/go.mod .
 RUN go mod download
 COPY gw-exchanger .
 EXPOSE 50051
-CMD ["go", "run", "cmd/main.go", "-migrate", "-startGrpc"]
+CMD ["go", "run", "cmd/main.go", "-docker", "-migrate", "-startGrpc"]
