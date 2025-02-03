@@ -10,6 +10,7 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.3.2
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.0.2
+	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.4
 	golang.org/x/crypto v0.32.0
