@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -12,22 +11,13 @@ import (
 )
 
 func Connect() *gorm.DB {
-	e := godotenv.Load(".env")
-	if e != nil {
-		panic("No env")
-	}
 	user := os.Getenv("db_user")
 	password := os.Getenv("db_pass")
 	dbName := os.Getenv("db_name")
 	dbHost := os.Getenv("db_host")
 	port := os.Getenv("db_port")
 
-	dsn := fmt.Sprintf(`
-	host=%s
-	user=%s
-	password=%s
-	dbname=%s
-	port=%s`,
+	dsn := fmt.Sprintf(` host=%s user=%s password=%s dbname=%s port=%s`,
 		dbHost, user, password, dbName, port)
 	db, err := gorm.Open(postgres.Open(string(dsn)),
 		&gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
@@ -47,4 +37,11 @@ func Migrate(db *gorm.DB) {
 	if err != nil {
 		log.Fatalln("Fail to migrate User error: ", err)
 	}
+}
+
+func ReInit(db *gorm.DB) {
+	db.Migrator().DropTable(&entities.User{})
+	db.Migrator().CreateTable(&entities.User{})
+	db.Migrator().DropTable(&entities.Wallet{})
+	db.Migrator().CreateTable(&entities.Wallet{})
 }

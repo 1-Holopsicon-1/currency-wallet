@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"wallet/internal/app/handler"
 	"wallet/internal/app/server"
@@ -21,9 +22,19 @@ import (
 func main() {
 	migr := flag.Bool("migrate", false, fmt.Sprint("Migrating Entity"))
 	start := flag.Bool("start", false, fmt.Sprint("Starting server"))
-
+	docker := flag.Bool("docker", false, fmt.Sprint("Loading docker env"))
 	flag.Parse()
-
+	if *docker {
+		err := godotenv.Load("docker.env")
+		if err != nil {
+			log.Fatal("Error loading docker.env file")
+		}
+	} else {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
 	if *migr {
 		session := db.Connect()
 		log.Println("Migrating")
