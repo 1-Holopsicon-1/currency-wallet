@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 	"wallet/internal/app/models"
 	"wallet/internal/app/storages/entities"
@@ -51,10 +50,10 @@ func (us *UserService) Login(db *gorm.DB, username, pw string) models.Response {
 	if err != nil {
 		return models.Response{Status: http.StatusUnauthorized, Message: "Wrong password"}
 	}
-	return models.Response{Status: http.StatusOK, Message: generateStringToken(strconv.FormatInt(userEntity.Id, 10))}
+	return models.Response{Status: http.StatusOK, Message: generateStringToken(userEntity.Id)}
 }
 
-func generateStringToken(userId string) string {
+func generateStringToken(userId int64) string {
 	tokenAuth := utils.GenerateToken()
 	claims := map[string]interface{}{
 		"userId": userId,
