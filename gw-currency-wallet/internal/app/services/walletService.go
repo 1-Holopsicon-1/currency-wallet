@@ -21,8 +21,6 @@ import (
 
 type WalletService struct{}
 
-var CacheManager = cache.New[any](mychace.InitRedis())
-
 func (service *WalletService) GetBalance(db *gorm.DB, claims map[string]interface{}) (dto.WalletDto, error) {
 	var wallet entities.Wallet
 
@@ -89,6 +87,7 @@ func (service *WalletService) Withdraw(db *gorm.DB, claims map[string]interface{
 
 func (service *WalletService) GetExchangeRates() (*proto.ExchangeRatesResponse, error) {
 	ctx := context.Background()
+	var CacheManager = cache.New[any](mychace.InitRedis())
 	if value, err := CacheManager.Get(ctx, "rates"); !errors.Is(err, redis.Nil) {
 		response := &proto.ExchangeRatesResponse{}
 		err := json.Unmarshal([]byte(value.(string)), &response.Rates)
@@ -120,6 +119,7 @@ func (service *WalletService) GetExchangeRates() (*proto.ExchangeRatesResponse, 
 func (service *WalletService) ChangeCurrency(db *gorm.DB, claims map[string]interface{},
 	currencyFrom, currencyTo string, amount float64) (map[string]interface{}, error) {
 	ctx := context.Background()
+	var CacheManager = cache.New[any](mychace.InitRedis())
 	var balance map[string]interface{}
 	currencyFrom = strings.ToLower(currencyFrom)
 	currencyTo = strings.ToLower(currencyTo)
