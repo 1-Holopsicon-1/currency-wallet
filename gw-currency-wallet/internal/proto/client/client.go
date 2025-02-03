@@ -3,7 +3,6 @@ package protoExchange
 import (
 	"context"
 	"fmt"
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -13,10 +12,6 @@ import (
 )
 
 func Connect() (proto.ExchangeServiceClient, error) {
-	e := godotenv.Load(".env")
-	if e != nil {
-		panic("No env")
-	}
 	host := os.Getenv("proto_host")
 	port := os.Getenv("proto_port")
 	serverAddress := fmt.Sprintf("%s:%s", host, port)
